@@ -1,0 +1,20 @@
+security:
+    password_hashers:
+        Symfony\Component\Security\Core\User\InMemoryUser: plaintext
+
+    providers:
+        users_for_tests:
+            memory:
+                users:
+                    super_admin: { password: '%env(APP_SECRET)%', roles: [ 'ROLE_ADMIN', 'ROLE_SUPER_ADMIN' ] }
+    firewalls:
+        main:
+            lazy: true
+            provider: users_for_tests
+            entry_point: Atlance\JwtAuth\Tests\Kernel\Infrastructure\Http\Security\Authentication\EntryPoint
+            access_token:
+                token_handler: Atlance\JwtAuth\Security\UseCase\Access\Token\Handler
+
+    role_hierarchy:
+        ROLE_ADMIN: ROLE_USER
+        ROLE_SUPER_ADMIN: [ ROLE_ADMIN, ROLE_ALLOWED_TO_SWITCH ]

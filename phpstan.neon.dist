@@ -1,0 +1,17 @@
+parameters:
+    level: 8
+    symfony:
+    bootstrapFiles:
+        - vendor/autoload.php
+    checkMissingIterableValueType: false
+    checkGenericClassInNonGenericObjectType: false
+    tmpDir: Tests/Kernel/var/var/analyze
+    fileExtensions:
+        - php
+    paths:
+        - Security
+        - Token
+    ignoreErrors:
+    excludePaths:
+        - vendor
+

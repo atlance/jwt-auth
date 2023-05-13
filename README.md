@@ -1,0 +1,108 @@
+Symfony JWT Authentication
+==============
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/atlance/jwt-auth/badges/quality-score.png?b=main)](https://scrutinizer-ci.com/g/atlance/jwt-auth/?branch=main)
+[![Code Coverage](https://scrutinizer-ci.com/g/atlance/jwt-auth/badges/coverage.png?b=main)](https://scrutinizer-ci.com/g/atlance/jwt-auth/?branch=main)
+[![Build Status](https://scrutinizer-ci.com/g/atlance/jwt-auth/badges/build.png?b=main)](https://scrutinizer-ci.com/g/atlance/jwt-auth/build-status/main)
+[![Code Intelligence Status](https://scrutinizer-ci.com/g/atlance/jwt-auth/badges/code-intelligence.svg?b=main)](https://scrutinizer-ci.com/code-intelligence)
+![Psalm coverage](https://shepherd.dev/github/atlance/jwt-auth/coverage.svg)
+![GitHub](https://img.shields.io/badge/PHPStan-level%208-brightgreen.svg?style=flat)
+[![composer.lock](http://poser.pugx.org/phpunit/phpunit/composerlock)](https://packagist.org/packages/phpunit/phpunit)
+[![PHP analyze & tests](https://github.com/atlance/jwt-auth/actions/workflows/php-analyze.yml/badge.svg)](https://github.com/atlance/jwt-auth/actions/workflows/php-analyze.yml)
+## Installation
+
+1. <a href="/Resources/docs/generate_keys.md" target="_blank">Generate</a> keys.
+2. Install package via composer: `composer require atlance/jwt-auth @dev`.
+3. Configure:
+   - Copy/paste <a href="/Resources/config/config.yaml" target="_blank">configuration</a> to `config/packages/atlance_jwt_auth.yaml`.
+   - Copy/paste <a href="/.env.dist" target="_blank">environments</a> to your `.env` and configure.
+
+## Use Case
+
+### Create:
+- **Implemened:** `Atlance\JwtAuth\Security\UseCase\Create\Token\Handler`.
+- **Example**:
+```php
+<?php
+
+declare(strict_types=1);
+
+namespace App\Controller\Login;
+
+use Atlance\JwtAuth\Security\UseCase;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Core\Exception\UserNotFoundException;
+use Symfony\Component\Security\Core\User\UserProviderInterface;
+
+#[Route('/login', name: self::class, methods: ['POST'])]
+final class Controller extends AbstractController
+{
+    public function __invoke(
+        Request $request,
+        UserProviderInterface $provider,
+        UserPasswordHasherInterface $hasher,
+        UseCase\Create\Token\Handler $handler,
+    ): JsonResponse {
+        /** @var array{username:string,password:string} $dataset */
+        $dataset = json_decode($request->getContent(), true);
+
+        try {
+            $user = $provider->loadUserByIdentifier($dataset['username']);
+            $hasher->isPasswordValid($user, $hasher->hashPassword($user, $dataset['password']));
+
+            return new JsonResponse(['token' => $handler->handle($user)]);
+        } catch (UserNotFoundException) {
+            return new JsonResponse(status: Response::HTTP_BAD_REQUEST);
+        }
+    }
+}
+```
+
+### Access:
+**Implemened:** `Atlance\JwtAuth\Security\UseCase\Access\Token\Handler`.
+
+```yaml
+# config/packages/security.yaml
+security:
+    firewalls:
+        main:
+            access_token:
+                token_handler: Atlance\JwtAuth\Security\UseCase\Access\Token\Handler
+```
+- **And Symfony automatically used JWT for authentication**.
+- **More:** <a href="https://symfony.com/doc/6.2/security/access_token.html" target="_blank">How to use Access Token Authentication</a>.
+- **Example**:
+```php
+<?php
+
+declare(strict_types=1);
+
+namespace App\Controller\Profile;
+
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Security\Http\Attribute\CurrentUser;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
+
+#[IsGranted('ROLE_USER')]
+#[Route('/profile', name: self::class, methods: ['GET'])]
+class ProfileController extends AbstractController
+{
+    public function __invoke(#[CurrentUser] ?UserInterface $user = null): JsonResponse
+    {
+        return new JsonResponse(['username' => $user->getUserIdentifier()]);
+    }
+}
+```
+
+Resources
+---------
+* [component symfony/security](https://github.com/symfony/security-bundle/tree/6.2)
+* [component symfony/clock](https://github.com/symfony/clock/tree/6.2)
+* [library lcobucci/jwt](https://github.com/lcobucci/jwt/tree/5.0.x)
