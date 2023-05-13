@@ -1,0 +1,18 @@
+parameters:
+
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+        public: true
+
+    _instanceof:
+        Atlance\JwtAuth\Tests\Kernel\Infrastructure\Http\Controller\AbstractController:
+            tags: [ 'controller.service_arguments' ]
+
+    Atlance\JwtAuth\Tests\Kernel\:
+        resource: '%kernel.project_dir%'
+        exclude:
+            - '%kernel.project_dir%/Kernel.php'
+            - '%kernel.project_dir%/Resources'
+            - '%kernel.project_dir%/var'

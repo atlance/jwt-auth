@@ -1,0 +1,44 @@
+name: PHP analyze & tests
+
+on:
+  push: ~
+  pull_request: ~
+  schedule:
+    - cron: '0 */3 * * *'
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        php-version: ['7.4']
+
+    steps:
+      - uses: actions/checkout@master
+
+      - name: installing PHP
+        uses: shivammathur/setup-php@master
+        with:
+          php-version: ${{ matrix.php-version }}
+          tools: composer:latest
+
+      - name: Validate composer.json
+        run: composer validate --strict
+
+      - name: Install dependencies
+        run: composer install
+
+      - name: Run static php analyze.
+        run: composer php-analyze
+
+      - name: Run PHPUnit Tests
+        run: composer paratest
+
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@main
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}

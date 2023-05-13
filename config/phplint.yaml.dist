@@ -1,0 +1,11 @@
+path:
+  - ../src
+  - ../tests
+jobs: 10
+cache: ../var/.phplint
+extensions:
+  - php
+exclude:
+    - ../vendor
+    - ../var
+    - ../tests/Kernel/var

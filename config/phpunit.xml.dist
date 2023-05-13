@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" colors="true" processIsolation="true"
+         stopOnFailure="true" backupGlobals="false" cacheResult="false" bootstrap="../vendor/autoload.php"
+         xsi:noNamespaceSchemaLocation="../vendor/phpunit/phpunit/phpunit.xsd">
+  <php>
+    <ini name="display_errors" value="1"/>
+    <ini name="error_reporting" value="-1"/>
+    <ini name="memory-limit" value="-1"/>
+    <ini name="xdebug.start_with_request" value="yes"/>
+    <ini name="xdebug.client_host" value="application.local"/>
+    <ini name="xdebug.log_level" value="3"/>
+    <ini name="xdebug.log" value="/tmp/xdebug.log"/>
+    <env name="PHP_IDE_CONFIG" value="serverName=application.local" force="true"/>
+    <!-- kernel environments -->
+    <env name="APP_ENV" value="test" force="true"/>
+    <env name="APP_DEBUG" value="0" force="true"/>
+    <env name="APP_SECRET" value="47a888d83ba32550883b6474cabb4f22" force="true"/>
+    <!-- JWT environments -->
+    <env name="JWT_KEY_ALGORITHM_ID" value="HS256" force="true"/>
+    <env name="JWT_PRIVATE_KEY_FILE" value="%kernel.project_dir%/Resources/config/keys/private.pem" force="true"/>
+    <env name="JWT_PRIVATE_KEY_PASS_PHRASE" value="${APP_SECRET}" force="true"/>
+    <env name="JWT_PUBLIC_KEY_FILE" value="%kernel.project_dir%/Resources/config/keys/public.pem" force="true"/>
+    <env name="JWT_CLIENT_CLAIM_NAME" value="client_id" force="true"/>
+    <env name="JWT_TTL" value="3600" force="true"/>
+  </php>
+  <coverage>
+    <report>
+      <clover outputFile="../var/coverage/xml/coverage.xml"/>
+      <html outputDirectory="../var/coverage/html"/>
+    </report>
+    <include>
+      <directory suffix=".php">../src</directory>
+    </include>
+  </coverage>
+  <testsuites>
+    <testsuite name="jwt">
+      <directory>../tests</directory>
+    </testsuite>
+  </testsuites>
+</phpunit>

@@ -1,0 +1,16 @@
+/*
+!/.github
+!/config
+!/docs
+!/src
+!/tests
+/tests/Kernel/var
+
+!/.gitignore
+!/.gitattributes
+
+!/composer.json
+!/*.dist
+
+!/LICENSE.md
+!/README.md

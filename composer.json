@@ -1,0 +1,74 @@
+{
+    "name": "atlance/jwt-auth",
+    "description": "Symfony JWT Authentication",
+    "license": "MIT",
+    "type": "symfony-bundle",
+    "authors": [
+        {
+            "name": "Anton Stepanov",
+            "email": "lanposts@gmail.com"
+        }
+    ],
+    "require": {
+        "php": "^7.4",
+        "atlance/jwt-core": "^0.1",
+        "symfony/security-bundle": "^4.0",
+        "symfony/yaml": "^4.0"
+    },
+    "require-dev": {
+        "ext-json": "*",
+        "ext-mbstring": "*",
+        "brianium/paratest": "^6.0",
+        "doctrine/annotations": "^1.0",
+        "ergebnis/composer-normalize": "^2.0",
+        "fakerphp/faker": "^1.0",
+        "friendsofphp/php-cs-fixer": "^3.0",
+        "overtrue/phplint": "^3.0",
+        "phpstan/extension-installer": "^1.0",
+        "phpstan/phpstan": "^1.0",
+        "phpstan/phpstan-deprecation-rules": "^1.0",
+        "phpstan/phpstan-phpunit": "^1.0",
+        "phpstan/phpstan-strict-rules": "^1.0",
+        "phpstan/phpstan-symfony": "^1.0",
+        "psalm/plugin-symfony": "^4.0",
+        "rector/rector": "^0.18.11",
+        "sensio/framework-extra-bundle": "^6.0",
+        "squizlabs/php_codesniffer": "^3.0",
+        "symfony/browser-kit": "^4.0",
+        "symfony/framework-bundle": "^4.0",
+        "symfony/validator": "^4.0",
+        "vimeo/psalm": "^4.0"
+    },
+    "minimum-stability": "stable",
+    "autoload": {
+        "psr-4": {
+            "Atlance\\JwtAuth\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Atlance\\JwtAuth\\Tests\\": "tests"
+        }
+    },
+    "config": {
+        "allow-plugins": {
+            "ergebnis/composer-normalize": true,
+            "phpstan/extension-installer": true
+        }
+    },
+    "scripts": {
+        "cs-check": "vendor/bin/php-cs-fixer fix --config config/php_cs.dist.php --dry-run",
+        "cs-fix": "vendor/bin/php-cs-fixer fix --config config/php_cs.dist.php",
+        "paratest": "XDEBUG_MODE=coverage vendor/bin/paratest -c config/phpunit.xml.dist --colors --runner=WrapperRunner --coverage-clover ./coverage.xml",
+        "php-analyze": [
+            "@psalm",
+            "@cs-check",
+            "@phplint",
+            "@phpstan"
+        ],
+        "phplint": "vendor/bin/phplint -c config/phplint.yaml.dist",
+        "phpstan": "vendor/bin/phpstan analyse -c config/phpstan.neon.dist --no-progress --memory-limit=-1",
+        "psalm": "vendor/bin/psalm -c config/psalm.xml.dist --no-cache --threads=6 --memory-limit=-1 --shepherd",
+        "rector": "vendor/bin/rector process -c config/rector.dist.php"
+    }
+}

@@ -1,0 +1,19 @@
+atlance_jwt_auth:
+    # All about `openssl` keys.
+    openssl:
+        # Signature algorithm id: 'ES256', 'ES384', 'ES512' etc.
+        algorithm_id: "%env(string:resolve:JWT_KEY_ALGORITHM_ID)%"
+        # The path to `public.pem`.
+        public_key: "%env(string:resolve:JWT_PUBLIC_KEY_FILE)%"
+        # The path to `private.pem`.
+        private_key: "%env(string:resolve:JWT_PRIVATE_KEY_FILE)%"
+        # The pass phrase for `private.pem`.
+        private_passphrase: "%env(string:resolve:JWT_PRIVATE_KEY_PASS_PHRASE)%"
+    # JWT configuration.
+    jwt:
+        claims:
+            # Unique identifier for current client.
+            client_claim_name: "%env(string:resolve:JWT_CLIENT_CLAIM_NAME)%"
+        options:
+            # In seconds.
+            ttl: "%env(int:resolve:JWT_TTL)%"

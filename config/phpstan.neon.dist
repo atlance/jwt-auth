@@ -1,0 +1,16 @@
+parameters:
+    level: max
+    bootstrapFiles:
+        - ../vendor/autoload.php
+    checkMissingIterableValueType: false
+    checkGenericClassInNonGenericObjectType: false
+    tmpDir: ../var/analyze
+    fileExtensions:
+        - php
+    paths:
+        - ../src
+    ignoreErrors:
+    excludePaths:
+        - ../vendor
+        - ../var
+
