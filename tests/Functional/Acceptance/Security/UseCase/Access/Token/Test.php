@@ -17,11 +17,11 @@ class Test extends TestCase
 {
     public function testOk(): void
     {
-        $response = $this->requester()->post(Login\Controller::class, [], $this->credentials());
+        $response = $this->requester()->post(Login\Controller::class, content: $this->credentials());
         self::assertArrayHasKey('token', $response->content);
         $token = $response->content['token'];
 
-        $response = $this->requester()->get(Profile\Controller::class, [], Response::HTTP_OK, [
+        $response = $this->requester()->get(Profile\Controller::class, headers: [
             'HTTP_AUTHORIZATION' => sprintf('Bearer %s', $token),
         ]);
 
@@ -30,23 +30,15 @@ class Test extends TestCase
 
     public function testBadToken(): void
     {
-        $this->requester()->get(
-            Profile\Controller::class,
-            [],
-            Response::HTTP_FOUND,
-            [
-                'HTTP_AUTHORIZATION' => sprintf('Bearer %s', $this->dg()->text()),
+        $this->requester()->get(Profile\Controller::class, expectCode: Response::HTTP_UNAUTHORIZED, headers: [
+                'HTTP_AUTHORIZATION' => sprintf('Bearer %s', $this->dg()->uuid()),
             ]
         );
     }
 
     public function testExpiredToken(): void
     {
-        $this->requester()->get(
-            Profile\Controller::class,
-            [],
-            Response::HTTP_FOUND,
-            [
+        $this->requester()->get(Profile\Controller::class, expectCode: Response::HTTP_UNAUTHORIZED, headers: [
                 'HTTP_AUTHORIZATION' => sprintf(
                     'Bearer %s',// phpcs:disable
                     <<<TXT

@@ -6,8 +6,8 @@ services:
         autoconfigure: true
         public: false
 
-    Lcobucci\Clock\Clock:
-        factory: [ 'Lcobucci\Clock\SystemClock', 'fromSystemTimezone' ]
+    Psr\Clock\ClockInterface: # Interface
+        class: Symfony\Component\Clock\NativeClock
 
 # > --- lcobucci/jwt ---
     Lcobucci\JWT\Decoder: # Interface
@@ -50,7 +50,7 @@ services:
 
     Lcobucci\JWT\Validation\ValidAt: # Interface
         class: Lcobucci\JWT\Validation\Constraint\StrictValidAt
-        arguments: [ '@Lcobucci\Clock\Clock' ]
+        arguments: [ '@Psr\Clock\ClockInterface' ]
 # < --- lcobucci/jwt ---
 
 # > --- atlance/jwt-core  ---
@@ -63,7 +63,7 @@ services:
             - '@Lcobucci\JWT\Builder'
             - '@Lcobucci\JWT\Signer'
             - '@jwt_auth.private_key'
-            - '@Lcobucci\Clock\Clock'
+            - '@Psr\Clock\ClockInterface'
             - '%atlance_jwt_auth.ttl%'
 
     Atlance\JwtCore\Token\Contracts\Factory\TokenFactoryInterface: # Interface
@@ -104,3 +104,7 @@ services:
 
     Atlance\JwtAuth\Security\UseCase\Create\Token\HandlerInterface: # Interface
         class: Atlance\JwtAuth\Security\UseCase\Create\Token\Handler
+        public: true
+
+    Atlance\JwtAuth\Security\Factory\UserBadgeFactory:
+        public: true

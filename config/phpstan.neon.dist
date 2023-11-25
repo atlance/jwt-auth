@@ -8,7 +8,7 @@ parameters:
     fileExtensions:
         - php
     paths:
-        - ../src
+        - ../src/Security
     ignoreErrors:
     excludePaths:
         - ../vendor

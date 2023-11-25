@@ -14,7 +14,7 @@ use Rector\Set\ValueObject\SetList;
 // @see https://github.com/rectorphp/rector/blob/main/docs/rector_rules_overview.md
 return static function (RectorConfig $rectorConfig): void {
     $rectorConfig->bootstrapFiles([ 'vendor/autoload.php']);
-    $rectorConfig->phpVersion(PhpVersion::PHP_74);
+    $rectorConfig->phpVersion(PhpVersion::PHP_81);
     $rectorConfig->phpstanConfig('vendor/phpstan/phpstan-strict-rules/rules.neon');
     $rectorConfig->phpstanConfig('config/phpstan.neon.dist');
 
@@ -22,7 +22,7 @@ return static function (RectorConfig $rectorConfig): void {
         SetList::CODE_QUALITY,
         SetList::TYPE_DECLARATION,
         SetList::CODING_STYLE,
-        LevelSetList::UP_TO_PHP_74,
+        LevelSetList::UP_TO_PHP_81,
     ]);
 
     $rectorConfig->paths(['src', 'tests']);

@@ -6,20 +6,18 @@ namespace Atlance\JwtAuth\Tests\Functional\Acceptance\Security\UseCase\Create\To
 
 use Atlance\JwtAuth\Tests\Functional\Acceptance\TestCase;
 use Atlance\JwtAuth\Tests\Kernel\Infrastructure\Http\Controller\Login\Controller;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\Response;
 
 /** @see Controller */
 class Test extends TestCase
 {
-    /**
-     * @dataProvider dataset
-     *
-     * @param array{username:string,password:string} $credentials
-     */
+    /** @param array{username:string,password:string} $credentials */
+    #[DataProvider('dataset')]
     public function test(array $credentials, int $expectCode): void
     {
         $response = $this->requester()
-            ->post(Controller::class, [], $credentials, [], $expectCode);
+            ->post(Controller::class, content: $credentials, expectCode: $expectCode);
 
         if (Response::HTTP_OK === $expectCode) {
             self::assertArrayHasKey('token', $response->content);

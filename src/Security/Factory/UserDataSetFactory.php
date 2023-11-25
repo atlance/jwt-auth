@@ -11,15 +11,11 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 class UserDataSetFactory implements UserDataSetFactoryInterface
 {
-    /** @var non-empty-string */
-    private string $identifierClaimName;
-
     /**
      * @param non-empty-string $identifierClaimName
      */
-    public function __construct(string $identifierClaimName)
+    public function __construct(private readonly string $identifierClaimName)
     {
-        $this->identifierClaimName = $identifierClaimName;
     }
 
     /** @psalm-suppress DeprecatedClass */

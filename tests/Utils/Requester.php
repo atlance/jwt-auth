@@ -16,14 +16,10 @@ final class Requester extends Assert
 {
     use WebTestAssertionsTrait;
 
-    private KernelBrowser $client;
-
-    private RouterInterface $router;
-
-    public function __construct(KernelBrowser $client, RouterInterface $router)
-    {
-        $this->client = $client;
-        $this->router = $router;
+    public function __construct(
+        private readonly KernelBrowser $client,
+        private readonly RouterInterface $router
+    ) {
     }
 
     public function get(

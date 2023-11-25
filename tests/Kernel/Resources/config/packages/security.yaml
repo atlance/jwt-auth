@@ -1,5 +1,4 @@
 security:
-    enable_authenticator_manager: true
     password_hashers:
         Symfony\Component\Security\Core\User\InMemoryUser: plaintext
 
@@ -13,8 +12,8 @@ security:
             lazy: true
             provider: users_for_tests
             entry_point: Atlance\JwtAuth\Tests\Kernel\Infrastructure\Http\Security\Authentication\EntryPoint
-            custom_authenticators:
-                - Atlance\JwtAuth\Tests\Kernel\Infrastructure\Http\Security\Authentication\JWTAuthenticator
+            access_token:
+                token_handler: Atlance\JwtAuth\Security\Factory\UserBadgeFactory
 
     role_hierarchy:
         ROLE_ADMIN: ROLE_USER

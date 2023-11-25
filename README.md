@@ -1,7 +1,8 @@
-Symfony 5: JWT Authentication
+Symfony 6: JWT Authentication
 ==============
 [![composer.lock](http://poser.pugx.org/phpunit/phpunit/composerlock)](https://packagist.org/packages/phpunit/phpunit)
 [![PHP analyze & tests](https://github.com/atlance/jwt-auth/actions/workflows/php-analyze.yml/badge.svg)](https://github.com/atlance/jwt-auth/actions/workflows/php-analyze.yml)
+![Psalm level](https://shepherd.dev/github/atlance/jwt-auth/level.svg)
 ![Psalm coverage](https://shepherd.dev/github/atlance/jwt-auth/coverage.svg)
 ![GitHub](https://img.shields.io/badge/PHPStan-level%20max-brightgreen.svg?style=flat)
 [![codecov](https://codecov.io/gh/atlance/jwt-auth/graph/badge.svg?token=EV9EVMTRTL)](https://codecov.io/gh/atlance/jwt-auth)
@@ -9,7 +10,7 @@ Symfony 5: JWT Authentication
 ## Installation
 
 1. <a href="/docs/generate_keys.md" target="_blank">Generate</a> keys.
-2. Install package via composer: `composer require atlance/jwt-auth ^5.0`.
+2. Install package via composer: `composer require atlance/jwt-auth ^6.0`.
 3. Configure:
    - Copy/paste <a href="/src/Resources/config/atlance_jwt_auth.yaml" target="_blank">configuration</a> to 
      `config/packages/atlance_jwt_auth.yaml`.
@@ -37,7 +38,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Exception\UserNotFoundException;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 
-#[Route('/login', name: self::class, methods: ['POST'])]
+#[Route('/login', methods: ['POST'])]
 final class Controller extends AbstractController
 {
     public function __invoke(
@@ -62,23 +63,20 @@ final class Controller extends AbstractController
 ```
 
 ### Access:
-**Implemened:** `Atlance\JwtAuth\Security\UseCase\Access\Token\Handler`.
+**Implemened:**
+- `Atlance\JwtAuth\Security\UseCase\Access\Token\Handler`
+- `Atlance\JwtAuth\Security\Factory\UserBadgeFactory`
 
-1) Create custom [JWT Authenticator](./tests/Kernel/Infrastructure/Http/Security/Authentication/JWTAuthenticator.php).
-2) Configure `security firewall`:
-
-confugure
 ```yaml
 # config/packages/security.yaml
 security:
-    enable_authenticator_manager: true
     firewalls:
         main:
-           custom_authenticators:
-                - App\Infrastructure\Http\Security\Authentication\JWTAuthenticator
+            access_token:
+                token_handler: Atlance\JwtAuth\Security\Factory\UserBadgeFactory
 ```
 - **And Symfony automatically used JWT for authentication**.
-- **More:** <a href="https://symfony.com/doc/5.4/security/custom_authenticator.html" target="_blank">How to use Access Token Authentication</a>.
+- **More:** <a href="https://symfony.com/doc/6.2/security/access_token.html" target="_blank">How to use Access Token Authentication</a>.
 - **Example**:
 ```php
 <?php
@@ -87,23 +85,26 @@ declare(strict_types=1);
 
 namespace App\Controller\Profile;
 
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Security\Http\Attribute\CurrentUser;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[IsGranted('ROLE_USER')]
-#[Route('/profile', name: self::class, methods: ['GET'])]
-final class Controller extends AbstractController
+#[Route('/profile', methods: ['GET'])]
+class ProfileController extends AbstractController
 {
-    public function __invoke(): JsonResponse
+    public function __invoke(#[CurrentUser] ?UserInterface $user = null): JsonResponse
     {
-        return new JsonResponse(['username' => $this->getUser()->getUserIdentifier()]);
+        return new JsonResponse(['username' => $user->getUserIdentifier()]);
     }
 }
 ```
 
 Resources
 ---------
-* [component symfony/security](https://github.com/symfony/security-bundle/tree/5.4)
+* [component symfony/security](https://github.com/symfony/security-bundle/tree/6.2)
+* [component symfony/clock](https://github.com/symfony/clock/tree/6.2)
 * [decorator of lcobucci/jwt](https://github.com/atlance/jwt-core)

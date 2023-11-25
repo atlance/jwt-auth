@@ -9,14 +9,10 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
 
 final class Handler implements HandlerInterface
 {
-    private DecodeInterface $decoder;
-
-    private string $identifierClaimName;
-
-    public function __construct(DecodeInterface $decoder, string $identifierClaimName)
-    {
-        $this->decoder = $decoder;
-        $this->identifierClaimName = $identifierClaimName;
+    public function __construct(
+        private readonly DecodeInterface $decoder,
+        private readonly string $identifierClaimName
+    ) {
     }
 
     public function handle(string $accessToken): string

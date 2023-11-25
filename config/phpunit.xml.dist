@@ -1,7 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" colors="true" processIsolation="true"
-         stopOnFailure="true" backupGlobals="false" cacheResult="false" bootstrap="../vendor/autoload.php"
-         xsi:noNamespaceSchemaLocation="../vendor/phpunit/phpunit/phpunit.xsd">
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         colors="true"
+         processIsolation="true"
+         stopOnFailure="true"
+         backupGlobals="false"
+         cacheResult="false"
+         bootstrap="../vendor/autoload.php"
+         xsi:noNamespaceSchemaLocation="../vendor/phpunit/phpunit/phpunit.xsd"
+         cacheDirectory="../tests/Kernel/var/.phpunit.cache">
   <php>
     <ini name="display_errors" value="1"/>
     <ini name="error_reporting" value="-1"/>
@@ -23,18 +29,24 @@
     <env name="JWT_CLIENT_CLAIM_NAME" value="client_id" force="true"/>
     <env name="JWT_TTL" value="3600" force="true"/>
   </php>
+
   <coverage>
     <report>
       <clover outputFile="../var/coverage/xml/coverage.xml"/>
       <html outputDirectory="../var/coverage/html"/>
     </report>
-    <include>
-      <directory suffix=".php">../src</directory>
-    </include>
   </coverage>
+
   <testsuites>
     <testsuite name="jwt">
       <directory>../tests</directory>
     </testsuite>
   </testsuites>
+
+  <source>
+    <include>
+      <directory suffix=".php">../src/Security</directory>
+    </include>
+  </source>
+
 </phpunit>
