@@ -11,16 +11,13 @@ use Symfony\Component\Routing\Annotation\Route;
 
 /**
  * @IsGranted("ROLE_USER")
- * @Route(
- *     "/profile",
- *     name=Controller::class,
- *     methods={"GET"}
- * )
+ *
+ * @Route("/profile", name=Controller::class, methods={"GET"})
  */
-final class Controller extends AbstractController
+class Controller extends AbstractController
 {
     public function __invoke(): JsonResponse
     {
-        return new JsonResponse(['username' => $this->getUser()->getUsername()]);
+        return new JsonResponse(['username' => $this->getUser()->getUserIdentifier()]);
     }
 }

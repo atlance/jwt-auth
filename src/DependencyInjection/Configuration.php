@@ -10,6 +10,7 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
 /**
  * @psalm-suppress MixedMethodCall
  * @psalm-suppress PossiblyUndefinedMethod
+ * @psalm-suppress UndefinedMethod
  */
 class Configuration implements ConfigurationInterface
 {

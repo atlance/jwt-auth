@@ -26,7 +26,7 @@ class UserDataSetFactory implements UserDataSetFactoryInterface
     public function create(UserInterface $user): DataSetInterface
     {
         return DataSetFactory::fromHashTable([
-            $this->identifierClaimName => $user->getUsername(),
+            $this->identifierClaimName => $user->getUserIdentifier(),
             'roles' => $user->getRoles(),
         ]);
     }

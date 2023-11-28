@@ -1,6 +1,7 @@
 security:
-    encoders:
-        Symfony\Component\Security\Core\User\UserInterface: plaintext
+    enable_authenticator_manager: true
+    password_hashers:
+        Symfony\Component\Security\Core\User\InMemoryUser: plaintext
 
     providers:
         users_for_tests:
@@ -9,12 +10,11 @@ security:
                     super_admin: { password: '%env(APP_SECRET)%', roles: [ 'ROLE_ADMIN', 'ROLE_SUPER_ADMIN' ] }
     firewalls:
         main:
-            anonymous: true
+            lazy: true
             provider: users_for_tests
             entry_point: Atlance\JwtAuth\Tests\Kernel\Infrastructure\Http\Security\Authentication\EntryPoint
-            guard:
-                authenticators:
-                    - Atlance\JwtAuth\Tests\Kernel\Infrastructure\Http\Security\Authentication\JWTAuthenticator
+            custom_authenticators:
+                - Atlance\JwtAuth\Tests\Kernel\Infrastructure\Http\Security\Authentication\JWTAuthenticator
 
     role_hierarchy:
         ROLE_ADMIN: ROLE_USER

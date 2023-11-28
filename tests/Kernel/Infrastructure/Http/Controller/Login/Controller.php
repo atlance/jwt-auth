@@ -10,13 +10,14 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
-use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
+use Symfony\Component\Security\Core\Exception\UserNotFoundException;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 
 /**
  * @IsGranted("IS_AUTHENTICATED_ANONYMOUSLY")
+ *
  * @Route("/login", name=Controller::class, methods={"POST"})
  */
 final class Controller extends AbstractController
@@ -24,18 +25,18 @@ final class Controller extends AbstractController
     public function __invoke(
         Request $request,
         UserProviderInterface $provider,
-        UserPasswordEncoderInterface $encoder,
+        UserPasswordHasherInterface $hasher,
         UseCase\Create\Token\HandlerInterface $handler
     ): JsonResponse {
         /** @var array{username:string,password:string} $dataset */
         $dataset = $this->jsonDecode($request);
 
         try {
-            $user = $provider->loadUserByUsername($dataset['username']);
-            $encoder->isPasswordValid($user, $encoder->encodePassword($user, $dataset['password']));
+            $user = $provider->loadUserByIdentifier($dataset['username']);
+            $hasher->isPasswordValid($user, $hasher->hashPassword($user, $dataset['password']));
 
             return new JsonResponse(['token' => $handler->handle($user)]);
-        } catch (UsernameNotFoundException $usernameNotFoundException) {
+        } catch (UserNotFoundException $userNotFoundException) {
             return new JsonResponse(null, Response::HTTP_BAD_REQUEST);
         }
     }

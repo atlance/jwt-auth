@@ -1,20 +1,20 @@
 parameters:
-    # configured in extension load.
+# configured in extension load.
 services:
     _defaults:
         autowire: true
         autoconfigure: true
         public: false
 
-# > --- lcobucci/jwt ---
     Lcobucci\Clock\Clock:
         factory: [ 'Lcobucci\Clock\SystemClock', 'fromSystemTimezone' ]
 
+# > --- lcobucci/jwt ---
     Lcobucci\JWT\Decoder: # Interface
-        class: Lcobucci\JWT\Parsing\Decoder
+        class: Lcobucci\JWT\Encoding\JoseEncoder
 
     Lcobucci\JWT\Encoder: # Interface
-        class: Lcobucci\JWT\Parsing\Encoder
+        class: Lcobucci\JWT\Encoding\JoseEncoder
 
     Lcobucci\JWT\Signer: # Interface
         factory: [ 'Atlance\JwtCore\Token\Factory\SignerResolver', 'resolve' ]
@@ -30,8 +30,8 @@ services:
         factory: [ 'Lcobucci\JWT\Signer\Key\InMemory', 'file' ]
         arguments: [ '%atlance_jwt_auth.private_key%', '%atlance_jwt_auth.private_passphrase%' ]
 
-    Lcobucci\JWT\Parser: # Class
-        class: Lcobucci\JWT\Parser
+    Lcobucci\JWT\Parser: # Interface
+        class: Lcobucci\JWT\Token\Parser
         arguments: [ '@Lcobucci\JWT\Decoder' ]
 
     Lcobucci\JWT\ClaimsFormatter: # Interface
@@ -40,50 +40,61 @@ services:
     Lcobucci\JWT\Validator: # Interface
         class: Lcobucci\JWT\Validation\Validator
 
-    Lcobucci\JWT\Builder: # Class
-        class: Lcobucci\JWT\Builder
+    Lcobucci\JWT\Builder: # Interface
+        class: Lcobucci\JWT\Token\Builder
+        arguments: [ '@Lcobucci\JWT\Encoder', '@Lcobucci\JWT\ClaimsFormatter' ]
 
-    Lcobucci\JWT\Validation\SignedWith: # Class
+    Lcobucci\JWT\Validation\SignedWith: # Interface
         class: Lcobucci\JWT\Validation\Constraint\SignedWith
         arguments: [ '@Lcobucci\JWT\Signer', '@jwt_auth.private_key' ]
 
-    Lcobucci\JWT\Validation\ValidAt: # Class
-        class: Lcobucci\JWT\Validation\Constraint\ValidAt
+    Lcobucci\JWT\Validation\ValidAt: # Interface
+        class: Lcobucci\JWT\Validation\Constraint\StrictValidAt
+        arguments: [ '@Lcobucci\Clock\Clock' ]
 # < --- lcobucci/jwt ---
 
-# > --- atlance/jwt  ---
+# > --- atlance/jwt-core  ---
     Atlance\JwtCore\Token\Validation\Constraint\HasClaim: # Class
         arguments: [ '%atlance_jwt_auth.client_claim_name%' ]
 
-    Atlance\JwtCore\Token\Validation\Contracts\ValidatorInterface: # Interface
-        class: Atlance\JwtCore\Token\Validation\Validator
-        arguments:
-        - '@Lcobucci\JWT\Validator'
-        - '@Lcobucci\JWT\Validation\SignedWith'
-        - '@Lcobucci\JWT\Validation\ValidAt'
-        - '@Atlance\JwtCore\Token\Validation\Constraint\HasClaim'
-
-    Atlance\JwtCore\Token\Contracts\Builder\Decorator\JWTBuilderInterface: # Interface
+    Atlance\JwtCore\Token\Contracts\Builder\Decorator\NullableArgsDecoratorInterface: # Interface
         class: Atlance\JwtCore\Token\Builder
         arguments:
-            $key: '@jwt_auth.private_key'
-            $ttl: '%atlance_jwt_auth.ttl%'
+            - '@Lcobucci\JWT\Builder'
+            - '@Lcobucci\JWT\Signer'
+            - '@jwt_auth.private_key'
+            - '@Lcobucci\Clock\Clock'
+            - '%atlance_jwt_auth.ttl%'
 
     Atlance\JwtCore\Token\Contracts\Factory\TokenFactoryInterface: # Interface
         class: Atlance\JwtCore\Token\Factory\TokenFactory
+        arguments: [ '@Atlance\JwtCore\Token\Contracts\Builder\Decorator\NullableArgsDecoratorInterface' ]
+
+    Atlance\JwtCore\Token\Validation\Validator: # Class
+        arguments:
+            - '@Lcobucci\JWT\Validator'
+            - '@Lcobucci\JWT\Validation\SignedWith'
+            - '@Lcobucci\JWT\Validation\ValidAt'
+            - '@Atlance\JwtCore\Token\Validation\Constraint\HasClaim'
+
+    Atlance\JwtCore\Token\Contracts\EncodeInterface: # Interface
+        class: Atlance\JwtCore\Token\UseCase\Encode\Handler
+        arguments:
+            - '@Atlance\JwtCore\Token\Contracts\Factory\TokenFactoryInterface'
+            - '@Atlance\JwtCore\Token\Validation\Validator'
 
     Atlance\JwtCore\Token\Contracts\DecodeInterface: # Interface
         class: Atlance\JwtCore\Token\UseCase\Decode\Handler
         arguments:
-
-    Atlance\JwtCore\Token\Contracts\EncodeInterface:
-        class: Atlance\JwtCore\Token\UseCase\Encode\Handler
-# < --- atlance/jwt  ---
+            - '@Lcobucci\JWT\Parser'
+            - '@Atlance\JwtCore\Token\Validation\Validator'
+# < --- atlance/jwt-core  ---
 
 # > --- atlance/jwt-auth  ---
     Atlance\JwtAuth\Security\Factory\Contracts\UserDataSetFactoryInterface: # Interface
         class: Atlance\JwtAuth\Security\Factory\UserDataSetFactory
-        arguments: ['%atlance_jwt_auth.client_claim_name%']
+        arguments:
+            $identifierClaimName: '%atlance_jwt_auth.client_claim_name%'
 
     Atlance\JwtAuth\Security\UseCase\Access\Token\HandlerInterface: # Interface
         class: Atlance\JwtAuth\Security\UseCase\Access\Token\Handler
@@ -93,4 +104,3 @@ services:
 
     Atlance\JwtAuth\Security\UseCase\Create\Token\HandlerInterface: # Interface
         class: Atlance\JwtAuth\Security\UseCase\Create\Token\Handler
-        public: true

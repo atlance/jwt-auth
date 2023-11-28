@@ -9,73 +9,55 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
-use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
-use Symfony\Component\Security\Guard\AbstractGuardAuthenticator;
+use Symfony\Component\Security\Http\Authenticator\AbstractAuthenticator;
+use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
+use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPassport;
 
-final class JWTAuthenticator extends AbstractGuardAuthenticator
+final class JWTAuthenticator extends AbstractAuthenticator
 {
     private Contracts\HeaderExtractorInterface $extractor;
 
-    private HandlerInterface $authenticator;
+    private UserProviderInterface $provider;
 
-    public function __construct(Contracts\HeaderExtractorInterface $extractor, HandlerInterface $authenticator)
-    {
+    private HandlerInterface $factory;
+
+    public function __construct(
+        Contracts\HeaderExtractorInterface $extractor,
+        UserProviderInterface $provider,
+        HandlerInterface $factory
+    ) {
         $this->extractor = $extractor;
-        $this->authenticator = $authenticator;
+        $this->provider = $provider;
+        $this->factory = $factory;
     }
 
     /** {@inheritdoc} */
-    public function supports(Request $request): bool
+    public function supports(Request $request): ?bool
     {
         return $this->extractor->supported($request);
     }
 
     /** {@inheritdoc} */
-    public function onAuthenticationSuccess(Request $request, TokenInterface $token, $providerKey): ?Response
+    public function authenticate(Request $request)
+    {
+        return new SelfValidatingPassport(
+            new UserBadge(
+                $this->factory->handle($this->extractor->extract($request)),
+                function (string $identifier) {
+                    return $this->provider->loadUserByIdentifier($identifier);
+                }
+            )
+        );
+    }
+
+    public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $firewallName): ?Response
     {
         return null;
     }
 
-    /** {@inheritdoc} */
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception): ?Response
     {
         throw $exception;
-    }
-
-    /** {@inheritdoc} */
-    public function getCredentials(Request $request): string
-    {
-        return $this->extractor->extract($request);
-    }
-
-    /** {@inheritdoc} */
-    public function getUser($credentials, UserProviderInterface $userProvider): ?UserInterface
-    {
-        if (null === $credentials) {
-            return null;
-        }
-
-        $identifier = $this->authenticator->handle($credentials);
-
-        return $userProvider->loadUserByUsername($identifier);
-    }
-
-    /** {@inheritdoc} */
-    public function checkCredentials($credentials, UserInterface $user): bool
-    {
-        return true;
-    }
-
-    /** {@inheritdoc} */
-    public function supportsRememberMe(): bool
-    {
-        return false;
-    }
-
-    /** {@inheritdoc} */
-    public function start(Request $request, AuthenticationException $authException = null): Response
-    {
-        return new Response(null, Response::HTTP_UNAUTHORIZED);
     }
 }
