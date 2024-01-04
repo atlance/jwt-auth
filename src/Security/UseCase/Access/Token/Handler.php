@@ -7,12 +7,10 @@ namespace Atlance\JwtAuth\Security\UseCase\Access\Token;
 use Atlance\JwtCore\Token\Contracts\DecodeInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 
-final class Handler implements HandlerInterface
+final readonly class Handler implements HandlerInterface
 {
-    public function __construct(
-        private readonly DecodeInterface $decoder,
-        private readonly string $identifierClaimName
-    ) {
+    public function __construct(private DecodeInterface $decoder, private string $identifierClaimName)
+    {
     }
 
     public function handle(string $accessToken): string

@@ -1,4 +1,4 @@
-Symfony 6: JWT Authentication
+Symfony 7: JWT Authentication
 ==============
 [![composer.lock](http://poser.pugx.org/phpunit/phpunit/composerlock)](https://packagist.org/packages/phpunit/phpunit)
 [![PHP analyze & tests](https://github.com/atlance/jwt-auth/actions/workflows/php-analyze.yml/badge.svg)](https://github.com/atlance/jwt-auth/actions/workflows/php-analyze.yml)
@@ -10,7 +10,7 @@ Symfony 6: JWT Authentication
 ## Installation
 
 1. <a href="/docs/generate_keys.md" target="_blank">Generate</a> keys.
-2. Install package via composer: `composer require atlance/jwt-auth ^6.0`.
+2. Install package via composer: `composer require atlance/jwt-auth ^7.0`.
 3. Configure:
    - Copy/paste <a href="/src/Resources/config/atlance_jwt_auth.yaml" target="_blank">configuration</a> to 
      `config/packages/atlance_jwt_auth.yaml`.
@@ -76,7 +76,8 @@ security:
                 token_handler: Atlance\JwtAuth\Security\Factory\UserBadgeFactory
 ```
 - **And Symfony automatically used JWT for authentication**.
-- **More:** <a href="https://symfony.com/doc/6.2/security/access_token.html" target="_blank">How to use Access Token Authentication</a>.
+- **More:** <a href="https://symfony.com/doc/7.1/security/access_token.html" target="_blank">How to use Access Token 
+  Authentication</a>.
 - **Example**:
 ```php
 <?php
@@ -105,6 +106,6 @@ class ProfileController extends AbstractController
 
 Resources
 ---------
-* [component symfony/security](https://github.com/symfony/security-bundle/tree/6.2)
-* [component symfony/clock](https://github.com/symfony/clock/tree/6.2)
+* [component symfony/security](https://github.com/symfony/security-bundle/tree/7.0)
+* [component symfony/clock](https://github.com/symfony/clock/tree/7.0)
 * [decorator of lcobucci/jwt](https://github.com/atlance/jwt-core)
