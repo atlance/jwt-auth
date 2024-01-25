@@ -17,7 +17,7 @@ final readonly class EntryPoint implements AuthenticationEntryPointInterface
     {
     }
 
-    public function start(Request $request, AuthenticationException $authException = null): RedirectResponse
+    public function start(Request $request, ?AuthenticationException $authException = null): RedirectResponse
     {
         return new RedirectResponse($this->urlGenerator->generate(Login\Controller::class));
     }

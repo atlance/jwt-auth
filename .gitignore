@@ -1,7 +1,9 @@
 /*
 !/.github
 !/config
+!/docker
 !/docs
+!/make
 !/src
 !/tests
 /tests/Kernel/var
@@ -13,4 +15,5 @@
 !/*.dist
 
 !/LICENSE.md
+!/Makefile
 !/README.md
